@@ -1826,7 +1826,7 @@ namespace Windows.UI.Xaml
 				=> Instance.GetHashCode() ^
 					Property.UniqueId.GetHashCode();
 
-			public override bool Equals(object obj)
+			public override bool Equals(object? obj)
 				=> Equals(obj as DependencyPropertyPath);
 
 			public bool Equals(DependencyPropertyPath? other)
@@ -1857,7 +1857,7 @@ namespace Windows.UI.Xaml
 		{
 			public static readonly WeakReferenceValueComparer Default = new WeakReferenceValueComparer();
 
-			public bool Equals(WeakReference x, WeakReference y)
+			public bool Equals(WeakReference? x, WeakReference? y)
 			{
 				return ReferenceEquals(x?.Target, y?.Target);
 			}

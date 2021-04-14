@@ -50,7 +50,7 @@ namespace Uno.UI.Xaml.Controls
 			}
 		}
 
-		private void FocusedElemenLayoutUpdated(object sender, object e) => SetLayoutProperties();
+		private void FocusedElemenLayoutUpdated(object? sender, object e) => SetLayoutProperties();
 
 		private void FocusedElementSizeChanged(object sender, SizeChangedEventArgs args) => SetLayoutProperties();
 
