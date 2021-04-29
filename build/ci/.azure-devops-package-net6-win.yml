@@ -30,14 +30,10 @@ jobs:
     NUGET_PACKAGES: $(Agent.WorkFolder)\.nuget
 
     # net6 related
-    DotNetVersion: 6.0.100-preview.3.21202.5
+    DotNetVersion: 6.0.100-preview.4.21226.14
+    MauiCheck.Version: 0.4.1
     DotNet.Cli.Telemetry.OptOut: true
-    Android.Msi: https://dl.internalx.com/vsts-devdiv/Xamarin.Android/public/net6/4624420/6.0.1xx-preview3/7d6cd1cde4182d7db2cfc5d0b55364c972b6d34f/Microsoft.NET.Workload.Android.11.0.200.196.msi
-    Android.Pkg: https://dl.internalx.com/vsts-devdiv/Xamarin.Android/public/net6/4624420/6.0.1xx-preview3/7d6cd1cde4182d7db2cfc5d0b55364c972b6d34f/Microsoft.NET.Workload.Android-11.0.200-preview.3.196.pkg
-    iOS.Msi: https://bosstoragemirror.azureedge.net/wrench/6.0.1xx-preview3/f68d4d9c2a342daf9eaad364ccbe252e009d3901/4623693/package/Microsoft.NET.Workload.iOS.14.4.100-preview.3.1326.msi
-    iOS.Pkg: https://bosstoragemirror.azureedge.net/wrench/6.0.1xx-preview3/f68d4d9c2a342daf9eaad364ccbe252e009d3901/4623693/package/notarized/Microsoft.iOS.Bundle.14.4.100-preview.3.1326.pkg
-    macOS.Pkg: https://bosstoragemirror.azureedge.net/wrench/6.0.1xx-preview3/f68d4d9c2a342daf9eaad364ccbe252e009d3901/4623693/package/notarized/Microsoft.macOS.Bundle.11.1.100-preview.3.1379.pkg
-    MacCatalyst.Pkg: https://bosstoragemirror.azureedge.net/wrench/6.0.1xx-preview3/f68d4d9c2a342daf9eaad364ccbe252e009d3901/4623693/package/notarized/Microsoft.MacCatalyst.Bundle.14.3.100-preview.3.471.pkg
+    MauiCheck.Manifest: https://raw.githubusercontent.com/Redth/dotnet-maui-check/main/manifests/maui-dev.manifest.json
 
   steps:
   - checkout: self
@@ -59,19 +55,10 @@ jobs:
     errorActionPreference: stop
 
   - powershell: |
-      & dotnet tool install --global boots
-      & boots $(Android.Msi)
-      & boots $(iOS.Msi)
-    displayName: install .NET workloads
+      & dotnet tool update --global redth.net.maui.check --version $(MauiCheck.Version) --add-source https://api.nuget.org/v3/index.json
+      & maui-check --ci --non-interactive --fix --skip androidsdk --skip xcode --skip vswin --skip vsmac --manifest $(MauiCheck.Manifest)
+    displayName: Install .NET 6 Workloads
     errorActionPreference: stop
-
-  - powershell: |
-      dotnet tool install -g Redth.Net.Maui.Check
-      maui-check --dev --ci --fix --non-interactive
-      $global:LASTEXITCODE = 0
-      maui-check --dev --ci --fix --non-interactive
-      $global:LASTEXITCODE = 0
-    displayName: Adjusting dotnet installation
 
   - template: templates/install-windows-sdk.yml
 

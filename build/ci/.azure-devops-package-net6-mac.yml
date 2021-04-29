@@ -27,15 +27,10 @@ jobs:
     NUGET_PACKAGES: $(Agent.WorkFolder)/.nuget
 
     # net6 related
-    DotNetVersion: 6.0.100-preview.3.21202.5
+    DotNetVersion: 6.0.100-preview.4.21226.14
     DotNet.Cli.Telemetry.OptOut: true
-    Android.Msi: https://dl.internalx.com/vsts-devdiv/Xamarin.Android/public/net6/4624420/6.0.1xx-preview3/7d6cd1cde4182d7db2cfc5d0b55364c972b6d34f/Microsoft.NET.Workload.Android.11.0.200.196.msi
-    Android.Pkg: https://dl.internalx.com/vsts-devdiv/Xamarin.Android/public/net6/4624420/6.0.1xx-preview3/7d6cd1cde4182d7db2cfc5d0b55364c972b6d34f/Microsoft.NET.Workload.Android-11.0.200-preview.3.196.pkg
-    iOS.Msi: https://bosstoragemirror.azureedge.net/wrench/6.0.1xx-preview3/f68d4d9c2a342daf9eaad364ccbe252e009d3901/4623693/package/Microsoft.NET.Workload.iOS.14.4.100-preview.3.1326.msi
-    iOS.Pkg: https://bosstoragemirror.azureedge.net/wrench/6.0.1xx-preview3/f68d4d9c2a342daf9eaad364ccbe252e009d3901/4623693/package/notarized/Microsoft.iOS.Bundle.14.4.100-preview.3.1326.pkg
-    macOS.Pkg: https://bosstoragemirror.azureedge.net/wrench/6.0.1xx-preview3/f68d4d9c2a342daf9eaad364ccbe252e009d3901/4623693/package/notarized/Microsoft.macOS.Bundle.11.1.100-preview.3.1379.pkg
-    MacCatalyst.Pkg: https://bosstoragemirror.azureedge.net/wrench/6.0.1xx-preview3/f68d4d9c2a342daf9eaad364ccbe252e009d3901/4623693/package/notarized/Microsoft.MacCatalyst.Bundle.14.3.100-preview.3.471.pkg
-    dotnetMac.Pkg: https://download.visualstudio.microsoft.com/download/pr/fc5fdd1f-fb4c-4b88-a507-158204030320/98497ef248883404ff5b0604dda944fb/dotnet-sdk-6.0.100-preview.3.21202.5-osx-x64.pkg
+    MauiCheck.Version: 0.4.1
+    MauiCheck.Manifest: https://raw.githubusercontent.com/Redth/dotnet-maui-check/main/manifests/maui-dev.manifest.json
 
     LogDirectory: $(Build.ArtifactStagingDirectory)/logs
     DOTNET_ROOT: /usr/local/share/dotnet/
@@ -77,19 +72,10 @@ jobs:
   #    sudo touch $DOTNET_ROOT/sdk/6.0.100-preview.3.21202.5/EnableWorkloadResolver.sentinel
   #  displayName: Install .NET $(DotNetVersion)
 
-  - bash: |
-      dotnet tool install --global boots
-      boots $(dotnetMac.Pkg)
-      boots $(Android.Pkg)
-      boots $(iOS.Pkg)
-      boots $(macOS.Pkg)
-      boots $(MacCatalyst.Pkg)
-    displayName: Install .NET workloads
-
-  - bash: |
-      dotnet tool install -g Redth.Net.Maui.Check
-      maui-check --dev --ci --fix --non-interactive || true
-    displayName: Adjusting dotnet installation
+  - bash: >
+      dotnet tool update --global redth.net.maui.check --version $(MauiCheck.Version) --add-source https://api.nuget.org/v3/index.json &&
+      maui-check --ci --non-interactive --fix --skip androidsdk --skip xcode --skip vswin --skip vsmac --manifest $(MauiCheck.Manifest)
+      displayName: Install .NET Workloads
 
   - bash: sudo xcode-select -s /Applications/Xcode_12.4.app
     displayName: select Xcode 12.4
