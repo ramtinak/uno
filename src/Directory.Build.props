@@ -6,6 +6,7 @@
 
   <PropertyGroup>
     <NoWarn>$(NoWarn);1998</NoWarn>
+    <NoWarn>$(NoWarn);CA1416</NoWarn> <!-- Disable warning about cross platform call sites -->
     <DebugType>portable</DebugType>
     <DebugSymbols>True</DebugSymbols>
     <RepositoryUrl>$(BUILD_REPOSITORY_URI)</RepositoryUrl>
