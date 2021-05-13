@@ -31,7 +31,7 @@ jobs:
 
     # net6 related
     DotNetVersion: 6.0.100-preview.4.21226.14
-    MauiCheck.Version: 0.4.1
+    MauiCheck.Version: 0.4.2
     DotNet.Cli.Telemetry.OptOut: true
     MauiCheck.Manifest: https://raw.githubusercontent.com/Redth/dotnet-maui-check/main/manifests/maui-dev.manifest.json
 
