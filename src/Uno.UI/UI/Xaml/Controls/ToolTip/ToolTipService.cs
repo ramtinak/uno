@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Input;
 using Uno.UI;
+using Uno.Disposables;
 
 namespace Windows.UI.Xaml.Controls
 {
@@ -19,7 +20,7 @@ namespace Windows.UI.Xaml.Controls
 			return element.GetValue(ToolTipProperty);
 		}
 
-		public static void SetToolTip( global::Windows.UI.Xaml.DependencyObject element, object value)
+		public static void SetToolTip(DependencyObject element, object value)
 		{
 			element.SetValue(ToolTipProperty, value);
 		}
@@ -46,7 +47,7 @@ namespace Windows.UI.Xaml.Controls
 			if (toolTip != null)
 			{
 				// First time: we're subscribing to event handlers
-
+				var visibilitySubscription = new SerialDisposable();
 				long currentHoverId = 0;
 
 				toolTip.SetAnchor(element);
@@ -55,6 +56,7 @@ namespace Windows.UI.Xaml.Controls
 				{
 					element.PointerEntered += OnPointerEntered;
 					element.PointerExited += OnPointerExited;
+					visibilitySubscription.Disposable = element.RegisterDisposablePropertyChangedCallback(UIElement.VisibilityProperty, OnVisibilityChanged);
 				};
 
 				element.Unloaded += (snd, evt) =>
@@ -63,6 +65,7 @@ namespace Windows.UI.Xaml.Controls
 
 					element.PointerEntered -= OnPointerEntered;
 					element.PointerExited -= OnPointerExited;
+					visibilitySubscription.Disposable = null;
 				};
 
 				void OnPointerEntered(object snd, PointerRoutedEventArgs evt)
@@ -74,6 +77,15 @@ namespace Windows.UI.Xaml.Controls
 				{
 					currentHoverId++;
 					toolTip.IsOpen = false;
+				}
+
+				void OnVisibilityChanged(DependencyObject snd, DependencyPropertyChangedEventArgs evt)
+				{
+					if (evt.NewValue is Visibility value && value != Visibility.Visible)
+					{
+						currentHoverId++;
+						toolTip.IsOpen = false;
+					}
 				}
 
 				async Task HoverTask(long hoverId)
